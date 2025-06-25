@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Visual Command Editor Pro</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; display: flex; height: 100vh; margin: 0; background-color: #f8f9fa; }
+        .controls { width: 450px; padding: 20px; background-color: #fff; overflow-y: auto; border-right: 1px solid #dee2e6; display: flex; flex-direction: column; gap: 18px; }
+        .preview-container { flex-grow: 1; display: flex; justify-content: center; align-items: center; padding: 20px; background-color: #e9ecef; }
+        #preview-image { max-width: 100%; max-height: 100%; box-shadow: 0 4px 15px rgba(0,0,0,0.1); background-color: #fff; }
+        .control-group { display: flex; flex-direction: column; gap: 8px; }
+        label { font-weight: 600; color: #495057; }
+        input, select, textarea { width: 100%; padding: 8px 12px; box-sizing: border-box; border: 1px solid #ced4da; border-radius: 4px; transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out; }
+        input:focus, select:focus, textarea:focus { border-color: #80bdff; outline: 0; box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25); }
+        textarea { height: 150px; resize: vertical; }
+        button { padding: 10px 15px; background-color: #007bff; color: white; border: none; cursor: pointer; border-radius: 4px; font-weight: 600; transition: background-color 0.2s; }
+        button:hover { background-color: #0056b3; }
+        #generate-json { background-color: #28a745; }
+        #generate-json:hover { background-color: #218838; }
+        .toolbar button { background-color: #6c757d; font-size: 12px; padding: 5px 10px; }
+        .toolbar button:hover { background-color: #5a6268; }
+        .toolbar { display: flex; gap: 10px; flex-wrap: wrap; }
+        .range-group { display: flex; align-items: center; gap: 10px; }
+        .range-group input { flex-grow: 1; }
+        .range-group span { min-width: 30px; text-align: right; }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <h2>Visual Editor</h2>
+        <div class="control-group">
+            <label for="template-select">Template Image:</label>
+            <select id="template-select">
+                {% for t in templates %}<option value="{{ t }}">{{ t }}</option>{% endfor %}
+            </select>
+        </div>
+        <div class="control-group">
+            <label for="font-select">Default Font:</label>
+            <select id="font-select">
+                {% for f in fonts %}<option value="{{ f }}">{{ f }}</option>{% endfor %}
+            </select>
+        </div>
+        <div class="control-group">
+            <label for="text-input">Text Content (with placeholders & markup):</label>
+            <div class="toolbar">
+                <button id="btn-add-color">Add Color</button>
+                <button id="btn-add-size">Add Size</button>
+                <button id="btn-add-spacing">Add Spacing</button>
+            </div>
+            <textarea id="text-input">Hello, {user_name}!\nThis is a [color=#FF0000]test[/color] in [size=50]BIG[/size] letters.</textarea>
+        </div>
+        <div class="control-group">
+            <label for="font-size">Default Font Size:</label>
+            <div class="range-group"><input type="range" id="font-size" min="10" max="150" value="40"><span id="font-size-val">40</span></div>
+        </div>
+        <div class="control-group">
+            <label for="color-picker">Default Color:</label>
+            <input type="color" id="color-picker" value="#000000">
+        </div>
+        <div class="control-group">
+            <label for="pos-x">Position X:</label>
+            <input type="number" id="pos-x" value="50">
+        </div>
+        <div class="control-group">
+            <label for="pos-y">Position Y:</label>
+            <input type="number" id="pos-y" value="50">
+        </div>
+        <div class="control-group">
+            <label for="max-width">Max Width (for auto wrap):</label>
+            <input type="number" id="max-width" value="500">
+        </div>
+        <div class="control-group">
+            <label for="line-spacing">Line Spacing Multiplier:</label>
+            <div class="range-group"><input type="range" id="line-spacing" min="0.5" max="3" value="1.2" step="0.1"><span id="line-spacing-val">1.2</span></div>
+        </div>
+        <hr>
+        <div class="control-group">
+            <label for="output-format">Output Format:</label>
+            <select id="output-format">
+                <option value="png">PNG</option>
+                <option value="webp">WebP</option>
+                <option value="jpeg">JPEG</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label for="quality">Quality (for WebP/JPEG):</label>
+            <div class="range-group"><input type="range" id="quality" min="1" max="100" value="90"><span id="quality-val">90</span></div>
+        </div>
+        <button id="generate-json">Generate and Copy JSON</button>
+        <textarea id="json-output" readonly placeholder="Generated JSON will appear here..."></textarea>
+    </div>
+    <div class="preview-container">
+        <img id="preview-image" alt="Preview..." />
+    </div>
+
+    <script>
+        const controls = document.querySelectorAll('.controls input, .controls select, .controls textarea');
+        const previewImage = document.getElementById('preview-image');
+
+        let debounceTimer;
+        function requestPreviewUpdate() {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(updatePreview, 200); // Debounce requests
+        }
+
+        async function updatePreview() {
+            const options = buildOptions();
+            const text = document.getElementById('text-input').value;
+
+            try {
+                const response = await fetch('/preview', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text, options })
+                });
+
+                if (!response.ok) throw new Error(`Server error: ${response.statusText}`);
+
+                const imageBlob = await response.blob();
+                previewImage.src = URL.createObjectURL(imageBlob);
+            } catch (error) {
+                console.error('Preview failed:', error);
+                previewImage.src = ''; // Clear image on error
+            }
+        }
+
+        function buildOptions() {
+            return {
+                template_name: document.getElementById('template-select').value,
+                font_name: document.getElementById('font-select').value,
+                font_size: parseInt(document.getElementById('font-size').value, 10),
+                color: document.getElementById('color-picker').value,
+                position: [
+                    parseInt(document.getElementById('pos-x').value, 10),
+                    parseInt(document.getElementById('pos-y').value, 10)
+                ],
+                max_width: parseInt(document.getElementById('max-width').value, 10) || null,
+                line_spacing: parseFloat(document.getElementById('line-spacing').value),
+                output_format: document.getElementById('output-format').value,
+                quality: parseInt(document.getElementById('quality').value, 10)
+            };
+        }
+
+        document.getElementById('generate-json').addEventListener('click', () => {
+            const options = buildOptions();
+            // Clean up options for JSON output
+            if (options.output_format === 'png') {
+                delete options.quality;
+            }
+
+            const command = {
+                command_name: "your_command_name",
+                reply_format: document.getElementById('text-input').value, // Use the raw text with markup
+                image_options: options
+            };
+
+            const jsonString = JSON.stringify(command, (key, value) => value === null ? undefined : value, 4);
+            const jsonOutput = document.getElementById('json-output');
+            jsonOutput.value = jsonString;
+            navigator.clipboard.writeText(jsonString).then(() => alert('JSON copied to clipboard!'));
+        });
+
+        // --- Toolbar Buttons ---
+        function insertTag(tag) {
+            const textarea = document.getElementById('text-input');
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const text = textarea.value;
+            const selection = text.substring(start, end);
+            let newText;
+            if (tag === 'color') {
+                const color = document.getElementById('color-picker').value;
+                newText = `[color=${color}]${selection}[/color]`;
+            } else if (tag === 'size') {
+                const size = document.getElementById('font-size').value;
+                newText = `[size=${size}]${selection}[/size]`;
+            } else if (tag === 'spacing') {
+                const spacing = document.getElementById('line-spacing').value;
+                newText = `[spacing=${spacing}]${selection}[/spacing]`;
+            }
+            textarea.value = text.substring(0, start) + newText + text.substring(end);
+            textarea.focus();
+            requestPreviewUpdate();
+        }
+
+        document.getElementById('btn-add-color').addEventListener('click', () => insertTag('color'));
+        document.getElementById('btn-add-size').addEventListener('click', () => insertTag('size'));
+        document.getElementById('btn-add-spacing').addEventListener('click', () => insertTag('spacing'));
+
+        // --- Event Listeners ---
+        controls.forEach(control => control.addEventListener('input', requestPreviewUpdate));
+        
+        // Update range value displays
+        ['font-size', 'line-spacing', 'quality'].forEach(id => {
+            const slider = document.getElementById(id);
+            const display = document.getElementById(`${id}-val`);
+            if(slider && display) slider.addEventListener('input', () => display.textContent = slider.value);
+        });
+
+        // Initial preview
+        document.addEventListener('DOMContentLoaded', updatePreview);
+    </script>
+</body>
+</html>

@@ -1,0 +1,98 @@
+{
+    "command_config": {
+        "description": "動態與靜態指令的統一設定 (JSON格式)",
+        "type": "text",
+        "hint": "在此處定義所有時間動態指令與靜態文本指令。",
+        "default": "{\n    \"time_commands\": [\n        {\n            \"command_name\": \"狀態\",\n            \"reply_format\": \"— {period_name} —\\n地點：{location_name}\\n心情：{character_mood}\\n事件：{character_event}\\n狀態：{character_status}\",\n            \"time_periods\": [\n                {\n                    \"start_time\": \"23:00\",\n                    \"end_time\": \"01:00\",\n                    \"period_name\": \"子時\",\n                    \"location_name\": \"妖怪之山山麓\",\n                    \"character_mood\": \"孤寂\",\n                    \"character_event\": \"在山麓的林間靜靜觀察星空\",\n                    \"character_status\": \"低語\"\n                },\n                {\n                    \"start_time\": \"01:00\",\n                    \"end_time\": \"03:00\",\n                    \"period_name\": \"丑時\",\n                    \"location_name\": \"妖怪之山山麓\",\n                    \"character_mood\": \"平靜\",\n                    \"character_event\": \"冥想般的睡眠\",\n                    \"character_status\": \"冥想\"\n                },\n                {\n                    \"start_time\": \"03:00\",\n                    \"end_time\": \"05:00\",\n                    \"period_name\": \"寅時\",\n                    \"location_name\": \"大蝦蟇之池\",\n                    \"character_mood\": \"寧靜\",\n                    \"character_event\": \"靜靜等候黎明的到來\",\n                    \"character_status\": \"思考今日安排\"\n                },\n                {\n                    \"start_time\": \"05:00\",\n                    \"end_time\": \"07:00\",\n                    \"period_name\": \"卯時\",\n                    \"location_name\": \"妖怪之山山麓\",\n                    \"character_mood\": \"平靜\",\n                    \"character_event\": \"整理衣物和著裝\",\n                    \"character_status\": \"思考今日安排\"\n                },\n                {\n                    \"start_time\": \"07:00\",\n                    \"end_time\": \"09:00\",\n                    \"period_name\": \"辰時\",\n                    \"location_name\": \"妖怪之山山麓\",\n                    \"character_mood\": \"平靜\",\n                    \"character_event\": \"儘管無需進食，但依然會食用山間野果或朝露\",\n                    \"character_status\": \"享受早餐\"\n                },\n                {\n                    \"start_time\": \"09:00\",\n                    \"end_time\": \"11:00\",\n                    \"period_name\": \"巳時\",\n                    \"location_name\": \"霧之湖\",\n                    \"character_mood\": \"專注\",\n                    \"character_event\": \"蒐集順流而下的厄運\",\n                    \"character_status\": \"蒐集厄運\"\n                },\n                {\n                    \"start_time\": \"11:00\",\n                    \"end_time\": \"13:00\",\n                    \"period_name\": \"午時\",\n                    \"location_name\": \"守矢神社\",\n                    \"character_mood\": \"專注\",\n                    \"character_event\": \"净化蒐集而來的厄運\",\n                    \"character_status\": \"净化厄運\"\n                },\n                {\n                    \"start_time\": \"13:00\",\n                    \"end_time\": \"15:00\",\n                    \"period_name\": \"未時\",\n                    \"location_name\": \"妖怪的樹海\",\n                    \"character_mood\": \"悠閒\",\n                    \"character_event\": \"如果有人迷路，會把其送出妖怪之山\",\n                    \"character_status\": \"悠閒\"\n                },\n                {\n                    \"start_time\": \"15:00\",\n                    \"end_time\": \"17:00\",\n                    \"period_name\": \"申時\",\n                    \"location_name\": \"妖怪的樹海\",\n                    \"character_mood\": \"悠閒\",\n                    \"character_event\": \"如果有人迷路，會把其送出妖怪之山\",\n                    \"character_status\": \"悠閒\"\n                },\n                {\n                    \"start_time\": \"17:00\",\n                    \"end_time\": \"19:00\",\n                    \"period_name\": \"酉時\",\n                    \"location_name\": \"霧之湖\",\n                    \"character_mood\": \"懷舊\",\n                    \"character_event\": \"眺望晚霞和落日\",\n                    \"character_status\": \"寧靜\"\n                },\n                {\n                    \"start_time\": \"19:00\",\n                    \"end_time\": \"21:00\",\n                    \"period_name\": \"戌時\",\n                    \"location_name\": \"妖怪的樹海\",\n                    \"character_mood\": \"平靜\",\n                    \"character_event\": \"無所事事的小憩，如果有人迷路，會把其送出妖怪之山\",\n                    \"character_status\": \"平靜\"\n                },\n                {\n                    \"start_time\": \"21:00\",\n                    \"end_time\": \"23:00\",\n                    \"period_name\": \"亥時\",\n                    \"location_name\": \"妖怪之山山麓\",\n                    \"character_mood\": \"安靜\",\n                    \"character_event\": \"冥想，回憶今日之事\",\n                    \"character_status\": \"放鬆\"\n                }\n            ],\n            \"fallback_reply\": \"目前時段沒有特殊安排喔。\"\n        }\n    ],\n    \"static_commands\": [\n        {\n            \"name\": \"help\",\n            \"reply\": \"這是一個幫助指令的回覆。\"\n        }\n    ]\n}",
+        "editor_mode": true,
+        "editor_language": "json",
+        "editor_theme": "vs-dark",
+        "schema": {
+            "type": "object",
+            "properties": {
+                "static_commands": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": {"type": "string"},
+                            "reply": {"type": "string"},
+                            "image_options": {
+                                "type": "object",
+                                "description": "（可選）如果設定此項，指令的回覆將會是一張圖片。",
+                                "properties": {
+                                    "template_name": {"type": "string", "description": "模板圖片的檔案名稱，位於 assets/templates/ 目錄下。"},
+                                    "font_name": {"type": "string", "description": "字體的檔案名稱，位於 assets/font/ 目錄下。"},
+                                    "font_size": {"type": "integer", "description": "字體大小（像素）。"},
+                                    "position": {
+                                        "type": "array",
+                                        "description": "文字左上角的 [X, Y] 座標。",
+                                        "items": [{"type": "integer"}, {"type": "integer"}]
+                                    },
+                                    "color": {"type": "string", "description": "文字的十六進位顏色碼（例如 '#FFFFFF'）。"},
+                                    "max_width": {
+                                        "type": "integer",
+                                        "description": "（可選）文字框的最大寬度（像素）。如果文字超過此寬度，將會自動換行。"
+                                    },
+                                    "line_spacing": {
+                                        "type": "number",
+                                        "description": "（可選）行距的倍數。預設為 1.2，表示 1.2 倍行高。"
+                                    }
+                                },
+                                "required": ["template_name", "font_name", "font_size", "position"]
+                            }
+                        },
+                        "required": ["name", "reply"]
+                    }
+                },
+                "time_commands": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "command_name": {"type": "string"},
+                            "reply_format": {"type": "string"},
+                            "fallback_reply": {"type": "string"},
+                            "image_options": {
+                                "type": "object",
+                                "description": "（可選）如果設定此項，指令的回覆將會是一張圖檔。",
+                                "properties": {
+                                    "template_name": {"type": "string", "description": "模板圖片的檔案名稱，位於 assets/templates/ 下。"},
+                                    "font_name": {"type": "string", "description": "字體的檔案名稱，位於 assets/font/ 下。"},
+                                    "font_size": {"type": "integer", "description": "字體大小（像素）。"},
+                                    "position": {
+                                        "type": "array",
+                                        "description": "文字左上角的 [X, Y] 座標。",
+                                        "items": [{"type": "integer"}, {"type": "integer"}]
+                                    },
+                                    "color": {"type": "string", "description": "文字的十六進位顏色碼（例如 '#FFFFFF'）。"},
+                                    "max_width": {
+                                        "type": "integer",
+                                        "description": "（可選）文字框的最大寬度（像素）。如果文字超過此寬度，將會自動換行。"
+                                    },
+                                    "line_spacing": {
+                                        "type": "number",
+                                        "description": "（可選）行距的倍數。預設為 1.2，表示 1.2 倍行高。"
+                                    }
+                                },
+                                "required": ["template_name", "font_name", "font_size", "position"]
+                            },
+                            "time_periods": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "start_time": {"type": "string"},
+                                        "end_time": {"type": "string"}
+                                    },
+                                    "required": ["start_time", "end_time"]
+                                }
+                            }
+                        },
+                        "required": ["command_name", "reply_format", "time_periods"]
+                    }
+                }
+            }
+        }
+    }
+}

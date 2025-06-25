@@ -1,0 +1,5 @@
+name: astrbot_plugin_freecmdX
+title: 自由指令插件
+description: 提供高度可自訂的、包含動態時間與靜態文本的指令系統。
+author: "Magstic, Gemini 2.5 Pro"
+version: "1.0.0"
